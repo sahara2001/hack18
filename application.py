@@ -1,5 +1,5 @@
 from flask import Flask, request, json
-from text_recognition import get_option
+from text_recognition import get_option,keyword_match
 app = Flask(__name__)
 
 @app.route("/")
@@ -32,14 +32,19 @@ def match():
     option = 'keyPhrases'
     result = get_option(documents3, option)
 
+    response = app.response_class(
+        response=json.dumps(keyword_match(1,0)),
+        status=200,
+        mimetype='application/json'
+    )
     error = None
     if request.method == 'POST':
         if request.form['username']!= None and request.form['doc']!=None:
             return "good"
         else:
-            error = 'Invalid username/password'
+            error = 'Invalid username'
     else:
-        return "please request data"
+        return response
 
 
-    return result
+    return response
