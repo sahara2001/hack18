@@ -2,25 +2,38 @@ import pprint
 import json
 import gzip
 
-
-#read json file
-def parse():
-
-    j=0
-    data={}
-    path = ['qa_Appliances.json.gz',
+__paths = ['qa_Appliances.json.gz',
     'qa_Automotive.json.gz',
     'qa_Baby.json.gz',
     'qa_Beauty.json.gz']
 
-    g = gzip.open(path[0], 'r')
+#read json file
+def parse(path):
+    g = gzip.open(path, 'r')
     for l in g:
-        data[j]=eval(l)
-        j+=1
-    return data
+        yield(eval(l))
+
+
 
 
 
 
 if __name__=="__main__":
-    pprint.pprint(parse()[1]['answer'])
+    data = parse(__paths[0])
+    rs1 = {}
+    qs = {}
+    la = {}
+    j = 1
+
+    for i in data:
+        
+        rs1[j] = i['answer']
+        qs[j] = i['question']
+        la[j] = 'en'
+        j+=1
+        if j >= 50:
+            break
+
+    print(rs1)
+    print(qs)
+
