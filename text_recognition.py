@@ -4,6 +4,7 @@ import requests
 from pprint import pprint
 from process import parse,__paths
 from difflib import SequenceMatcher
+from sklearn.metrics import jaccard_similarity_score
 
 
 #header for the request
@@ -125,8 +126,35 @@ def keyword_match(index,question=True):
             index += 1
     return matches
 
-#this match uses whole sentences to match and uses Levenshtein module
+def jaccard_similarity(list1, list2):
+    intersection = len(list(set(list1).intersection(list2)))
+    #print(list(set(list1).intersection(list2)))
+    union = (len(list1) + len(list2)) - intersection
+    return float(intersection / union)
+    
+#this match uses whole sentences to match and uses jaccard similarity module
+def keyword_jaccard_match(index,question=True):
+    matches = []
+    answers = parse_processed_answer()
+    questions = parse_processed_question()
 
+    tmp = next(questions)
+    seq1 = ' '.join(next(questions)['keyPhrases'])
+    index = 1
+    for i in answers:
+        seq2 = ' '.join(i['keyPhrases'])
+        
+        dist = jaccard_similarity(seq1,seq2)
+        if dist >= 0.5:
+            print(seq1)
+            print(seq2)
+            print(dist)
+            matches.append(index)
+            
+        index += 1
+        
+
+    return matches
 
 
 
@@ -155,8 +183,10 @@ if __name__=='__main__':
     option3 = 'keyPhrases'
     dataset_process(1)
     """
-    
+    print("First metric:")
     keyword_match(0,1)
     s1 = 'I had a wonderful experience! The rooms were wonderful and the staff was helpful.'
     s2 = 'I had a terrible time at the hotel. The staff was rude and the food was awful.'
-    print(SequenceMatcher(None, s1, s2).ratio())
+    #print(SequenceMatcher(None, s1, s2).ratio())
+    print('Second metric:')
+    keyword_jaccard_match(0,1)
